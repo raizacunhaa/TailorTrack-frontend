@@ -1,0 +1,79 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Mapeamos tus variables actuales al sistema de Tailwind 4 */
+  --color-text-main: #6b6375;
+  --color-text-heading: #08060d;
+  --color-bg-site: #fff;
+  --color-border-base: #e5e4e7;
+
+  /* Tu acento actual es violeta, pero para TailorTrack usaremos el verde */
+  --color-brand-primary: #059669;
+  --color-brand-accent: #a7f3d0;
+
+  /* Fuentes */
+  --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, Consolas, monospace;
+}
+
+/* Configuraciones globales usando tus estilos originales */
+:root {
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 145%;
+  letter-spacing: 0.18px;
+  color: var(--color-text-main);
+  background: var(--color-bg-site);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+/* Modo oscuro automático */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text-main: #9ca3af;
+    --color-text-heading: #f3f4f6;
+    --color-bg-site: #16171d;
+    --color-border-base: #2e303a;
+  }
+}
+
+/* Estilos de estructura */
+#root {
+  width: 1126px;
+  max-width: 100%;
+  margin: 0 auto;
+  border-inline: 1px solid var(--color-border-base);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+/* Headings con tus variables */
+h1,
+h2 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--color-text-heading);
+}
+
+h1 {
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
