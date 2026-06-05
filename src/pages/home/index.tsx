@@ -16,7 +16,7 @@ export default function HomePage() {
 
         <button
           onClick={logout}
-          className="w-full flex justify-center py-3 px-4 rounded-lg bg-red-600/90 text-white text-sm font-semibold shadow-sm hover:bg-red-500 transition-all duration-300 active:scale-95"
+          className="w-full flex justify-center py-3 px-4 rounded-lg bg-red-500/90 text-white text-sm font-semibold shadow-sm hover:bg-red-500 transition-all duration-300 active:scale-95"
         >
           Cerrar Sesión
         </button>
