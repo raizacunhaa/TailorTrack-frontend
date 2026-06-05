@@ -3,8 +3,9 @@ export const ROUTES = {
     login: '/auth',
     register: '/auth/register',
     recover: '/auth/recover',
-    reset: (token: string) => `/auth/reset/${token}`,
+    reset: (token: string) => `/reset?token=${encodeURIComponent(token)}`,
   },
+  home: '/home',
 } as const;
 
 export const API_ROUTES = {
@@ -14,5 +15,6 @@ export const API_ROUTES = {
     logout: '/auth/logout',
     recover: '/auth/recover-password',
     reset: '/auth/reset-password',
+    me: '/auth/me',
   },
 } as const;
