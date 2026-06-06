@@ -6,6 +6,12 @@ import RecoverPasswordPage from '../pages/auth/RecoverPasswordPage';
 import ResetPasswordPage from '../pages/auth/ResetPasswordPage';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 import HomePage from '../pages/home/index';
+import ProductsPage from '../pages/management/products';
+import CreateProductPage from '../pages/management/products/CreateProductPage';
+import EditProductPage from '../pages/management/products/EditProductPage';
+import CategoriesPage from '../pages/management/categories';
+import CreateCategoryPage from '../pages/management/categories/CreateBrandPage';
+import EditCategoryPage from '../pages/management/categories/EditBrandPage';
 
 const AppRoutes = () => {
   return (
@@ -22,6 +28,12 @@ const AppRoutes = () => {
 
       <Route element={<ProtectedRoute />}>
         <Route path={ROUTES.home} element={<HomePage />} />
+        <Route path={ROUTES.products.list} element={<ProductsPage />} />
+        <Route path={ROUTES.products.create} element={<CreateProductPage />} />
+        <Route path="/management/products/:id/edit" element={<EditProductPage />} />
+        <Route path={ROUTES.categories.list} element={<CategoriesPage />} />
+        <Route path={ROUTES.categories.create} element={<CreateCategoryPage />} />
+        <Route path="/management/categories/:id/edit" element={<EditCategoryPage />} />
       </Route>
 
       <Route path="/" element={<Navigate to={ROUTES.auth.login} />} />

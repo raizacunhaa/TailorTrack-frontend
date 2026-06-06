@@ -6,6 +6,16 @@ import { validatePassword } from '../helpers/password.validator';
 import { ROUTES } from '../constants/routes';
 import type { LoginError } from '../types/errors.types';
 
+type ApiError = {
+  response?: {
+    data?: {
+      details?: string[];
+      error?: string;
+      message?: string;
+    };
+  };
+};
+
 // 1. Extendemos la interfaz de errores para los nuevos campos
 interface RegisterError extends LoginError {
   firstName?: string;
@@ -104,12 +114,13 @@ export const useRegisterForm = () => {
       }
 
       navigate(`${ROUTES.auth.login}?registered=true`);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const apiResponse = error as ApiError;
       // Si el backend devuelve un array de errores (como vimos en el curl), los extraemos
       const apiError =
-        error.response?.data?.details?.[0] ||
-        error.response?.data?.error ||
-        error.response?.data?.message ||
+        apiResponse.response?.data?.details?.[0] ||
+        apiResponse.response?.data?.error ||
+        apiResponse.response?.data?.message ||
         'Error al crear la cuenta.';
 
       setErrors({ api: apiError });
