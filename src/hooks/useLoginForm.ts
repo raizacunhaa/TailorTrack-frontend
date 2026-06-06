@@ -7,6 +7,15 @@ import { validatePassword } from '../helpers/password.validator';
 import { ROUTES } from '../constants/routes';
 import type { LoginError } from '../types/errors.types';
 
+type ApiError = {
+  response?: {
+    data?: {
+      error?: string;
+      message?: string;
+    };
+  };
+};
+
 export const useLoginForm = () => {
   const navigate = useNavigate();
   const { login: saveAuth } = useAuth();
@@ -84,9 +93,12 @@ export const useLoginForm = () => {
           welcome: true,
         },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const apiResponse = error as ApiError;
       const apiError =
-        error.response?.data?.error || error.response?.data?.message || 'Credenciales incorrectas.';
+        apiResponse.response?.data?.error ||
+        apiResponse.response?.data?.message ||
+        'Credenciales incorrectas.';
       setErrors({ api: apiError });
       setLoginStatus('Iniciar sesión');
     } finally {

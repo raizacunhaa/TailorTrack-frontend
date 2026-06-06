@@ -2,6 +2,14 @@ import { useState } from 'react';
 import { validateEmail } from '../helpers/email.validator';
 import { recoverPassword as recoverService } from '../services/auth.service';
 
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+};
+
 export const useRecoverPassword = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | undefined>(undefined);
@@ -26,8 +34,11 @@ export const useRecoverPassword = () => {
     try {
       await recoverService(email);
       setSent(true);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al procesar la solicitud. Intenta más tarde.');
+    } catch (err: unknown) {
+      const apiError = err as ApiError;
+      setError(
+        apiError.response?.data?.message || 'Error al procesar la solicitud. Intenta más tarde.',
+      );
     } finally {
       setLoading(false);
     }

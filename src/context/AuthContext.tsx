@@ -1,10 +1,9 @@
-import { createContext, useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import api from '../lib/axios';
 import { API_ROUTES } from '../constants/routes';
-import type { User, AuthContextType } from '../types/auth.types';
-
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import type { User } from '../types/auth.types';
+import { AuthContext } from './auth-context';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -14,14 +13,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const verifyAuth = async () => {
       try {
-        // Ajuste: Según tu AuthController.me, el backend devuelve { user: req.user }
-        const { data } = await api.get<{ user: User }>(API_ROUTES.auth.me);
+        const { data } = await api.get<{ data: { user: User } }>(API_ROUTES.auth.me);
 
-        if (data.user) {
-          setUser(data.user);
+        if (data.data.user) {
+          setUser(data.data.user);
           setIsAuthenticated(true);
         }
-      } catch (error) {
+      } catch {
         setUser(null);
         setIsAuthenticated(false);
       } finally {

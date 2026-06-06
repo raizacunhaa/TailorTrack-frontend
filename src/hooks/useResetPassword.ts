@@ -3,6 +3,16 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { validatePassword } from '../helpers/password.validator';
 import { verifyResetToken, resetPassword } from '../services/auth.service';
 
+type ResetErrors = { p1?: string; p2?: string; api?: string };
+
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+};
+
 export const useResetPassword = () => {
   const { token: paramToken } = useParams<{ token: string }>();
   const [searchParams] = useSearchParams();
@@ -11,7 +21,7 @@ export const useResetPassword = () => {
   const [confirmPass, setConfirmPass] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [errors, setErrors] = useState<{ p1?: string; p2?: string; api?: string }>({});
+  const [errors, setErrors] = useState<ResetErrors>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
@@ -35,8 +45,11 @@ export const useResetPassword = () => {
       }
       try {
         await verifyResetToken(token);
-      } catch (err: any) {
-        setErrors({ api: err.response?.data?.message || 'El enlace ha expirado o es inválido.' });
+      } catch (err: unknown) {
+        const apiError = err as ApiError;
+        setErrors({
+          api: apiError.response?.data?.message || 'El enlace ha expirado o es inválido.',
+        });
       } finally {
         setTimeout(() => setIsChecking(false), 800);
       }
@@ -46,13 +59,13 @@ export const useResetPassword = () => {
 
   const handleInputChange = (field: 'p1' | 'p2', value: string, setter: (v: string) => void) => {
     setter(value);
-    if (errors[field]) setErrors((prev: any) => ({ ...prev, [field]: undefined }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
     const p1Validation = validatePassword(pass);
-    const newErrors: any = {
+    const newErrors: ResetErrors = {
       p1: p1Validation.password1 || undefined,
       p2: !confirmPass
         ? 'Por favor, repetí la contraseña.'
@@ -68,8 +81,9 @@ export const useResetPassword = () => {
     try {
       await resetPassword(token, pass);
       setSuccess(true);
-    } catch (err: any) {
-      setErrors({ api: err.response?.data?.message || 'Error al actualizar la contraseña.' });
+    } catch (err: unknown) {
+      const apiError = err as ApiError;
+      setErrors({ api: apiError.response?.data?.message || 'Error al actualizar la contraseña.' });
     } finally {
       setLoading(false);
     }

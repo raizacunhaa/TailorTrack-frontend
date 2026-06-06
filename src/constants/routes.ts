@@ -6,6 +6,22 @@ export const ROUTES = {
     reset: (token: string) => `/reset?token=${encodeURIComponent(token)}`,
   },
   home: '/home',
+  management: '/management',
+  products: {
+    list: '/management/products',
+    create: '/management/products/create',
+    edit: (id: string | number) => `/management/products/${id}/edit`,
+  },
+  categories: {
+    list: '/management/categories',
+    create: '/management/categories/create',
+    edit: (id: string | number) => `/management/categories/${id}/edit`,
+  },
+  brands: {
+    list: '/management/categories',
+    create: '/management/categories/create',
+    edit: (id: string | number) => `/management/categories/${id}/edit`,
+  },
 } as const;
 
 export const API_ROUTES = {

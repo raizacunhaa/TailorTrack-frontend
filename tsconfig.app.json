@@ -6,6 +6,7 @@
     "module": "ESNext",
     "types": ["vite/client", "node"],
     "skipLibCheck": true,
+    "ignoreDeprecations": "6.0",
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -14,6 +15,10 @@
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "moduleDetection": "force",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
     "noEmit": true,
     "jsx": "react-jsx",
 

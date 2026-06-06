@@ -1,9 +1,12 @@
 export interface User {
   id: number | string;
   email: string;
-  firstName: string; //
-  lastName: string; //
-  dni: string; //
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  dni?: string;
+  roleName?: string;
+  roleId?: number;
   role?: 'admin' | 'vendedor' | 'user';
 }
 
