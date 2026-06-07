@@ -53,7 +53,7 @@ export function ProductsTable({
             <tr>
               <Header onClick={() => onSort('rowNum')}># {renderSortArrow('rowNum')}</Header>
               <Header onClick={() => onSort('name')}>Nombre {renderSortArrow('name')}</Header>
-              <Header onClick={() => onSort('unit')}>Unidad {renderSortArrow('unit')}</Header>
+              <Header onClick={() => onSort('unit')}>Marca {renderSortArrow('unit')}</Header>
               <Header onClick={() => onSort('category')}>
                 Categoría {renderSortArrow('category')}
               </Header>

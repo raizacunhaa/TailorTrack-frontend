@@ -127,11 +127,11 @@ export function ProductForm({
           placeholder="Opcional"
         />
         <TextInput
-          label="Unidad por bulto *"
+          label="Marca *"
           name="unit"
           value={formData.unit}
           onChange={onChange}
-          placeholder="Ej: x 12 unidades"
+          placeholder="Ej: Levy's"
         />
         <div className="space-y-2">
           <label className="block text-sm font-medium text-slate-700 ml-1">Descripción</label>
