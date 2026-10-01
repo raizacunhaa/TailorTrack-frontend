@@ -1,4 +1,5 @@
-import type { Brand, Category, SubCategory } from './category.types';
+import type { Brand } from './brand.types';
+import type { Category, SubCategory } from './category.types';
 
 export interface Product {
   id: number;

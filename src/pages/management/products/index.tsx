@@ -6,6 +6,7 @@ import Pagination from '../../../components/PaginationManagement';
 import SearchBar from '../../../components/SearchBar';
 import { ConfirmDeleteModal } from '../../../components/ConfirmDeleteModal';
 import { ProductsTable } from '../../../components/management/products/ProductsTable';
+import { getApiErrorMessage } from '../../../helpers/api-error.helper';
 import { ROUTES } from '../../../constants/routes';
 import { productApi } from '../../../services/product.service';
 import type { Product } from '../../../types/product.types';
@@ -23,13 +24,15 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
+  const [reactivatingId, setReactivatingId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
         setError('');
-        setProducts(await productApi.getAllProducts());
+        setProducts(await productApi.getAllProducts(showInactive));
       } catch {
         setError('No pudimos cargar los productos desde el backend.');
       } finally {
@@ -38,12 +41,11 @@ export default function ProductsPage() {
     };
 
     fetchProducts();
-  }, []);
+  }, [showInactive]);
 
   const filteredProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     const filtered = products
-      .filter((product) => product.status !== false)
       .filter((product) => product.name.toLowerCase().includes(normalizedQuery))
       .map((product, index) => ({ ...product, originalIndex: index + 1 }));
 
@@ -98,13 +100,32 @@ export default function ProductsPage() {
     try {
       setDeleting(true);
       await productApi.disable(productToDelete.id);
-      setProducts((current) => current.filter((product) => product.id !== productToDelete.id));
-      setProductToDelete(null);
-      if (currentProducts.length === 1 && currentPage > 1) setCurrentPage((page) => page - 1);
-    } catch {
-      setError('No pudimos eliminar el producto.');
+      setProducts((current) =>
+        current.map((product) =>
+          product.id === productToDelete.id
+            ? { ...product, isActive: false, status: false }
+            : product,
+        ),
+      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'No pudimos desactivar el producto.'));
     } finally {
+      setProductToDelete(null);
       setDeleting(false);
+    }
+  };
+
+  const handleReactivate = async (product: Product) => {
+    try {
+      setReactivatingId(product.id);
+      await productApi.reactivate(product.id);
+      setProducts((current) =>
+        current.map((p) => (p.id === product.id ? { ...p, isActive: true, status: true } : p)),
+      );
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'No pudimos reactivar el producto.'));
+    } finally {
+      setReactivatingId(null);
     }
   };
 
@@ -139,6 +160,19 @@ export default function ProductsPage() {
           placeholder="Buscar por nombre del producto..."
         />
 
+        <label className="flex items-center gap-2 text-sm font-medium text-slate-600">
+          <input
+            type="checkbox"
+            checked={showInactive}
+            onChange={(e) => {
+              setShowInactive(e.target.checked);
+              setCurrentPage(1);
+            }}
+            className="h-4 w-4 rounded border-slate-300 text-sky-600"
+          />
+          Mostrar inactivos
+        </label>
+
         {loading ? (
           <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-xl shadow-slate-200/60">
             Cargando productos...
@@ -151,6 +185,8 @@ export default function ProductsPage() {
               onSort={handleSort}
               currentSortColumn={sortColumn}
               currentSortDirection={sortDirection}
+              onReactivate={handleReactivate}
+              reactivatingId={reactivatingId}
             />
             <Pagination
               totalItems={filteredProducts.length}

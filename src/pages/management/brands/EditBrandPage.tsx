@@ -3,10 +3,11 @@ import { ArrowLeft, SquarePen } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import DashboardLayout from '../../../layouts/DashboardLayout';
 import { ConfirmModal } from '../../../components/ConfirmModal';
+import { getApiErrorMessage } from '../../../helpers/api-error.helper';
 import { ROUTES } from '../../../constants/routes';
-import { categoryApi } from '../../../services/category.service';
+import { brandApi } from '../../../services/brand.service';
 
-export default function EditCategoryPage() {
+export default function EditBrandPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [name, setName] = useState('');
@@ -17,22 +18,22 @@ export default function EditCategoryPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchCategory = async () => {
+    const fetchBrand = async () => {
       if (!id) return;
       try {
         setLoading(true);
         setError('');
-        const category = await categoryApi.getById(id);
-        setName(category.name);
-        setInitialName(category.name);
+        const brand = await brandApi.getById(id);
+        setName(brand.name);
+        setInitialName(brand.name);
       } catch {
-        setError('No pudimos cargar la categoría desde el backend.');
+        setError('No pudimos cargar la marca desde el backend.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCategory();
+    fetchBrand();
   }, [id]);
 
   const isFormInvalid = !name.trim() || saving || name.trim() === initialName.trim();
@@ -42,10 +43,10 @@ export default function EditCategoryPage() {
     try {
       setSaving(true);
       setError('');
-      await categoryApi.update(id, { name: name.trim() });
-      navigate(ROUTES.categories.list);
-    } catch {
-      setError('No pudimos guardar los cambios.');
+      await brandApi.update(id, { name: name.trim() });
+      navigate(ROUTES.brands.list);
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'No pudimos guardar los cambios.'));
     } finally {
       setSaving(false);
       setShowConfirmModal(false);
@@ -57,7 +58,7 @@ export default function EditCategoryPage() {
       <div className="mx-auto max-w-3xl">
         <button
           type="button"
-          onClick={() => navigate(ROUTES.categories.list)}
+          onClick={() => navigate(ROUTES.brands.list)}
           className="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-sky-600 transition hover:text-sky-500 cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -67,9 +68,9 @@ export default function EditCategoryPage() {
         <div className="mb-5">
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-900">
             <SquarePen className="h-6 w-6 text-sky-600" />
-            Editar categoría
+            Editar marca
           </h1>
-          <p className="mt-1 text-sm text-slate-500">Actualizá el nombre de la categoría.</p>
+          <p className="mt-1 text-sm text-slate-500">Actualizá el nombre de la marca.</p>
         </div>
 
         {error && (
@@ -80,7 +81,7 @@ export default function EditCategoryPage() {
 
         {loading ? (
           <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-xl shadow-slate-200/70">
-            Cargando categoría...
+            Cargando marca...
           </div>
         ) : (
           <form
@@ -95,20 +96,17 @@ export default function EditCategoryPage() {
                 Vista previa
               </p>
               <p className="mt-2 text-lg font-bold text-slate-900">
-                {name.trim() || 'Categoría sin nombre'}
+                {name.trim() || 'Marca sin nombre'}
               </p>
               <p className="text-xs text-slate-500">ID: {id}</p>
             </div>
 
             <div className="space-y-2">
-              <label
-                htmlFor="category-name"
-                className="block text-sm font-medium text-slate-700 ml-1"
-              >
-                Nombre de la categoría *
+              <label htmlFor="brand-name" className="block text-sm font-medium text-slate-700 ml-1">
+                Nombre de la marca *
               </label>
               <input
-                id="category-name"
+                id="brand-name"
                 type="text"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
@@ -122,7 +120,7 @@ export default function EditCategoryPage() {
             <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
               <button
                 type="button"
-                onClick={() => navigate(ROUTES.categories.list)}
+                onClick={() => navigate(ROUTES.brands.list)}
                 className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 cursor-pointer"
               >
                 Cancelar

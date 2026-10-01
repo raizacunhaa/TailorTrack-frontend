@@ -1,5 +1,7 @@
 import api from '../lib/axios';
-import type { Brand, Category, SubCategory } from '../types/category.types';
+import { brandApi } from './brand.service';
+import type { Brand } from '../types/brand.types';
+import type { Category, SubCategory } from '../types/category.types';
 import type { CreateProductDto, Product, ProductEditBackend } from '../types/product.types';
 
 type ApiResponse<T> = {
@@ -30,6 +32,7 @@ type BackendProductPayload = {
   isAvailable: boolean;
   isActive: boolean;
   categoryId?: number | null;
+  brandId?: number | null;
   unit?: string;
 };
 
@@ -60,8 +63,8 @@ function toBackendPayload(payload: ProductEditBackend): Partial<BackendProductPa
     taxRate: 21,
     allowSellWithoutStock: false,
     isAvailable: payload.showingInCatalog ?? true,
-    isActive: true,
     categoryId: payload.categoryId || null,
+    brandId: payload.brandId || null,
     unit: payload.unit?.trim() || 'un',
   };
 }
@@ -72,9 +75,15 @@ export const productApi = {
     return normalizeProduct(data.data);
   },
 
-  getAllProducts: async (): Promise<Product[]> => {
-    const { data } = await api.get<ApiResponse<ProductsResponse>>('/products?limit=100');
+  getAllProducts: async (includeInactive = false): Promise<Product[]> => {
+    const { data } = await api.get<ApiResponse<ProductsResponse>>(
+      `/products?limit=100${includeInactive ? '&includeInactive=true' : ''}`,
+    );
     return data.data.products.map(normalizeProduct);
+  },
+
+  reactivate: async (id: string | number): Promise<void> => {
+    await api.patch(`/products/${id}/reactivate`);
   },
 
   create: async (payload: CreateProductDto): Promise<Product> => {
@@ -114,7 +123,7 @@ export const productApi = {
   },
 
   getAllBrands: async (): Promise<Brand[]> => {
-    return [];
+    return brandApi.getAll();
   },
 
   getAllSubcategories: async (): Promise<SubCategory[]> => {

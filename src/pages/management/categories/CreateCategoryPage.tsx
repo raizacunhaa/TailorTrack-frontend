@@ -3,6 +3,7 @@ import { ArrowLeft, FolderPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../../layouts/DashboardLayout';
 import { ConfirmModal } from '../../../components/ConfirmModal';
+import { getApiErrorMessage } from '../../../helpers/api-error.helper';
 import { ROUTES } from '../../../constants/routes';
 import { categoryApi } from '../../../services/category.service';
 
@@ -21,8 +22,13 @@ export default function CreateCategoryPage() {
       setError('');
       await categoryApi.create({ name: name.trim() });
       navigate(ROUTES.categories.list);
-    } catch {
-      setError('No pudimos crear la categoría. Revisá la conexión con el backend.');
+    } catch (err) {
+      setError(
+        getApiErrorMessage(
+          err,
+          'No pudimos crear la categoría. Revisá la conexión con el backend.',
+        ),
+      );
     } finally {
       setIsLoading(false);
       setShowConfirmModal(false);

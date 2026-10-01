@@ -4,8 +4,10 @@ import { PackagePlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../../layouts/DashboardLayout';
 import { ConfirmModal } from '../../../components/ConfirmModal';
+import { getApiErrorMessage } from '../../../helpers/api-error.helper';
 import { ROUTES } from '../../../constants/routes';
 import { productApi } from '../../../services/product.service';
+import type { Brand } from '../../../types/brand.types';
 import type { Category } from '../../../types/category.types';
 import type { ProductEditFrontend } from '../../../types/product.types';
 import { ErrorMessage, ProductForm, ProductFormHeader, ProductPreview } from './ProductFormParts';
@@ -16,6 +18,7 @@ export default function CreateProductPage() {
   const [formData, setFormData] = useState<ProductEditFrontend>(initialFormData);
   const [priceInput, setPriceInput] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -26,10 +29,14 @@ export default function CreateProductPage() {
       try {
         setLoadingOptions(true);
         setError('');
-        const categoriesData = await productApi.getAllCategories();
+        const [categoriesData, brandsData] = await Promise.all([
+          productApi.getAllCategories(),
+          productApi.getAllBrands(),
+        ]);
         setCategories(categoriesData.filter((item) => item.status !== false));
+        setBrands(brandsData.filter((item) => item.status !== false));
       } catch {
-        setError('No pudimos cargar categorías desde el backend.');
+        setError('No pudimos cargar categorías o marcas desde el backend.');
       } finally {
         setLoadingOptions(false);
       }
@@ -67,7 +74,7 @@ export default function CreateProductPage() {
   const isFormInvalid =
     !formData.name.trim() ||
     !formData.code.trim() ||
-    !formData.unit.trim() ||
+    !formData.brandId ||
     !formData.categoryId ||
     formData.price <= 0 ||
     saving ||
@@ -81,6 +88,7 @@ export default function CreateProductPage() {
         code: formData.code.trim(),
         barcode: formData.barcode.trim(),
         categoryId: formData.categoryId,
+        brandId: formData.brandId,
         name: formData.name.trim(),
         stock: Math.max(0, Math.floor(Number(formData.stock) || 0)),
         price: Math.max(0, formData.price),
@@ -90,8 +98,13 @@ export default function CreateProductPage() {
         unit: formData.unit.trim(),
       });
       navigate(ROUTES.products.list);
-    } catch {
-      setError('No pudimos crear el producto. Revisá los datos y la conexión con el backend.');
+    } catch (err) {
+      setError(
+        getApiErrorMessage(
+          err,
+          'No pudimos crear el producto. Revisá los datos y la conexión con el backend.',
+        ),
+      );
     } finally {
       setSaving(false);
       setShowConfirmModal(false);
@@ -120,6 +133,7 @@ export default function CreateProductPage() {
           formData={formData}
           priceInput={priceInput}
           categories={categories}
+          brands={brands}
           isFormInvalid={isFormInvalid}
           submitText="Crear producto"
           loadingOptions={loadingOptions}

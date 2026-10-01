@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { ArrowUp, CheckCircle, Eye, Pencil, Trash2 } from 'lucide-react';
+import { ArrowUp, CheckCircle, Eye, Pencil, RotateCcw, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
 import type { Product } from '../../../types/product.types';
@@ -11,17 +11,21 @@ type ProductWithIndex = Product & { originalIndex?: number };
 interface ProductsTableProps {
   products: ProductWithIndex[];
   onDelete: (product: Product) => void;
+  onReactivate: (product: Product) => void;
   onSort: (column: string) => void;
   currentSortColumn: string | null;
   currentSortDirection: 'asc' | 'desc' | null;
+  reactivatingId?: number | null;
 }
 
 export function ProductsTable({
   products,
   onDelete,
+  onReactivate,
   onSort,
   currentSortColumn,
   currentSortDirection,
+  reactivatingId = null,
 }: ProductsTableProps) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const formatARS = useMemo(
@@ -125,14 +129,28 @@ export function ProductsTable({
                       >
                         <Pencil className="h-4 w-4" />
                       </Link>
-                      <button
-                        type="button"
-                        title="Eliminar producto"
-                        onClick={() => onDelete(product)}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-rose-100 bg-rose-50 text-rose-600 transition hover:bg-rose-100 cursor-pointer"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      {product.isActive === false ? (
+                        <button
+                          type="button"
+                          title="Reactivar producto"
+                          onClick={() => onReactivate(product)}
+                          disabled={reactivatingId === product.id}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50 text-emerald-600 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                        >
+                          <RotateCcw
+                            className={`h-4 w-4 ${reactivatingId === product.id ? 'animate-spin' : ''}`}
+                          />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          title="Desactivar producto"
+                          onClick={() => onDelete(product)}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-rose-100 bg-rose-50 text-rose-600 transition hover:bg-rose-100 cursor-pointer"
+                        >
+                          <EyeOff className="h-4 w-4" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

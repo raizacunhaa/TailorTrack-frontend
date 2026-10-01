@@ -4,8 +4,10 @@ import { SquarePen } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import DashboardLayout from '../../../layouts/DashboardLayout';
 import { ConfirmModal } from '../../../components/ConfirmModal';
+import { getApiErrorMessage } from '../../../helpers/api-error.helper';
 import { ROUTES } from '../../../constants/routes';
 import { productApi } from '../../../services/product.service';
+import type { Brand } from '../../../types/brand.types';
 import type { Category } from '../../../types/category.types';
 import type { ProductEditFrontend } from '../../../types/product.types';
 import { ErrorMessage, ProductForm, ProductFormHeader, ProductPreview } from './ProductFormParts';
@@ -17,6 +19,7 @@ export default function EditProductPage() {
   const [formData, setFormData] = useState<ProductEditFrontend>(initialFormData);
   const [priceInput, setPriceInput] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -29,9 +32,10 @@ export default function EditProductPage() {
       try {
         setLoading(true);
         setError('');
-        const [product, categoriesData] = await Promise.all([
+        const [product, categoriesData, brandsData] = await Promise.all([
           productApi.getById(id),
           productApi.getAllCategories(),
+          productApi.getAllBrands(),
         ]);
 
         const categoryId = product.categoryId ?? product.category?.id ?? 0;
@@ -40,7 +44,7 @@ export default function EditProductPage() {
           name: product.name ?? '',
           code: product.code ?? '',
           barcode: product.barcode ?? '',
-          brandId: 0,
+          brandId: product.brandId ?? product.brand?.id ?? 0,
           categoryId,
           subCategoryId: 0,
           stock: product.stock ?? 0,
@@ -52,8 +56,9 @@ export default function EditProductPage() {
         });
         setPriceInput(formatPriceInput(product.price ?? 0));
         setCategories(categoriesData.filter((item) => item.status !== false));
+        setBrands(brandsData.filter((item) => item.status !== false));
       } catch {
-        setError('No pudimos cargar el producto o sus categorías desde el backend.');
+        setError('No pudimos cargar el producto, sus categorías o marcas desde el backend.');
       } finally {
         setLoading(false);
       }
@@ -91,7 +96,7 @@ export default function EditProductPage() {
   const isFormInvalid =
     !formData.name.trim() ||
     !formData.code.trim() ||
-    !formData.unit.trim() ||
+    !formData.brandId ||
     !formData.categoryId ||
     formData.price <= 0 ||
     saving ||
@@ -107,6 +112,7 @@ export default function EditProductPage() {
         code: formData.code.trim(),
         barcode: formData.barcode.trim(),
         categoryId: formData.categoryId,
+        brandId: formData.brandId,
         name: formData.name.trim(),
         stock: Math.max(0, Math.floor(Number(formData.stock) || 0)),
         price: Math.max(0, formData.price),
@@ -116,8 +122,8 @@ export default function EditProductPage() {
         unit: formData.unit.trim(),
       });
       navigate(ROUTES.products.list);
-    } catch {
-      setError('No pudimos guardar los cambios del producto.');
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'No pudimos guardar los cambios del producto.'));
     } finally {
       setSaving(false);
       setShowConfirmModal(false);
@@ -151,6 +157,7 @@ export default function EditProductPage() {
               formData={formData}
               priceInput={priceInput}
               categories={categories}
+              brands={brands}
               isFormInvalid={isFormInvalid}
               submitText="Guardar cambios"
               loadingOptions={loading}

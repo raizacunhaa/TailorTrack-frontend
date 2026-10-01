@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { FolderTree, LogOut, Menu, Package, UserCircle, X } from 'lucide-react';
+import { FolderTree, LogOut, Menu, Package, Tag, UserCircle, X } from 'lucide-react';
 import { useState } from 'react';
 import logo from '../assets/TailorTrackLogo.png';
 import { ROUTES } from '../constants/routes';
@@ -16,6 +16,7 @@ interface DashboardLayoutProps {
 const navigation = [
   { name: 'Productos', href: ROUTES.products.list, icon: Package },
   { name: 'Categorías', href: ROUTES.categories.list, icon: FolderTree },
+  { name: 'Marcas', href: ROUTES.brands.list, icon: Tag },
 ];
 
 function getUserName(user: ReturnType<typeof useAuth>['user']) {

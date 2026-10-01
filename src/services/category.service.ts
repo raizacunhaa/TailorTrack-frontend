@@ -1,10 +1,5 @@
 import api from '../lib/axios';
-import type {
-  Brand,
-  Category,
-  CreateCategoryDto,
-  UpdateCategoryDto,
-} from '../types/category.types';
+import type { Category, CreateCategoryDto, UpdateCategoryDto } from '../types/category.types';
 
 type ApiResponse<T> = {
   ok: boolean;
@@ -41,11 +36,5 @@ export const categoryApi = {
 
   delete: async (id: string | number): Promise<void> => {
     await api.delete(`/product-categories/${id}`);
-  },
-};
-
-export const brandApi = {
-  getAll: async (): Promise<Brand[]> => {
-    return [];
   },
 };

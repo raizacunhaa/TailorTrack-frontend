@@ -18,9 +18,9 @@ export const ROUTES = {
     edit: (id: string | number) => `/management/categories/${id}/edit`,
   },
   brands: {
-    list: '/management/categories',
-    create: '/management/categories/create',
-    edit: (id: string | number) => `/management/categories/${id}/edit`,
+    list: '/management/brands',
+    create: '/management/brands/create',
+    edit: (id: string | number) => `/management/brands/${id}/edit`,
   },
 } as const;
 

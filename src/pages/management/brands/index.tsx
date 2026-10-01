@@ -5,48 +5,48 @@ import DashboardLayout from '../../../layouts/DashboardLayout';
 import Pagination from '../../../components/PaginationManagement';
 import SearchBar from '../../../components/SearchBar';
 import { ConfirmDeleteModal } from '../../../components/ConfirmDeleteModal';
-import { CategoriesTable } from '../../../components/management/categories/CategoriesTable';
+import { BrandsTable } from '../../../components/management/brands/BrandsTable';
 import { getApiErrorMessage } from '../../../helpers/api-error.helper';
 import { ROUTES } from '../../../constants/routes';
-import { categoryApi } from '../../../services/category.service';
-import type { Category } from '../../../types/category.types';
+import { brandApi } from '../../../services/brand.service';
+import type { Brand } from '../../../types/brand.types';
 
 const ITEMS_PER_PAGE = 8;
 
-export default function CategoriesPage() {
+export default function BrandsPage() {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [query, setQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
-  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [brandToDelete, setBrandToDelete] = useState<Brand | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchBrands = async () => {
       try {
         setLoading(true);
         setError('');
-        setCategories(await categoryApi.getAll());
+        setBrands(await brandApi.getAll());
       } catch {
-        setError('No pudimos cargar las categorías desde el backend.');
+        setError('No pudimos cargar las marcas desde el backend.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCategories();
+    fetchBrands();
   }, []);
 
-  const filteredCategories = useMemo(() => {
+  const filteredBrands = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    const filtered = categories
-      .filter((category) => category.status !== false)
-      .filter((category) => category.name.toLowerCase().includes(normalizedQuery))
-      .map((category, index) => ({ ...category, originalIndex: index + 1 }));
+    const filtered = brands
+      .filter((brand) => brand.status !== false)
+      .filter((brand) => brand.name.toLowerCase().includes(normalizedQuery))
+      .map((brand, index) => ({ ...brand, originalIndex: index + 1 }));
 
     if (!sortColumn || !sortDirection) return filtered;
 
@@ -62,9 +62,9 @@ export default function CategoriesPage() {
         ? String(first).localeCompare(String(second))
         : String(second).localeCompare(String(first));
     });
-  }, [categories, query, sortColumn, sortDirection]);
+  }, [brands, query, sortColumn, sortDirection]);
 
-  const currentCategories = filteredCategories.slice(
+  const currentBrands = filteredBrands.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
@@ -82,37 +82,37 @@ export default function CategoriesPage() {
   };
 
   const handleDelete = async () => {
-    if (!categoryToDelete) return;
+    if (!brandToDelete) return;
     try {
       setDeleting(true);
-      await categoryApi.delete(categoryToDelete.id);
-      setCategories((current) => current.filter((category) => category.id !== categoryToDelete.id));
-      if (currentCategories.length === 1 && currentPage > 1) setCurrentPage((page) => page - 1);
+      await brandApi.delete(brandToDelete.id);
+      setBrands((current) => current.filter((brand) => brand.id !== brandToDelete.id));
+      if (currentBrands.length === 1 && currentPage > 1) setCurrentPage((page) => page - 1);
     } catch (err) {
       setError(
         getApiErrorMessage(
           err,
-          'No pudimos eliminar la categoría. Revisá si tiene productos asociados.',
+          'No pudimos eliminar la marca. Revisá si tiene productos asociados.',
         ),
       );
     } finally {
-      setCategoryToDelete(null);
+      setBrandToDelete(null);
       setDeleting(false);
     }
   };
 
   return (
     <DashboardLayout
-      title="Categorías"
-      subtitle="Administrá las categorías disponibles para clasificar productos."
+      title="Marcas"
+      subtitle="Administrá las marcas disponibles para clasificar productos."
       actions={
         <button
           type="button"
-          onClick={() => navigate(ROUTES.categories.create)}
+          onClick={() => navigate(ROUTES.brands.create)}
           className="inline-flex items-center gap-2 rounded-2xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-500 active:scale-95 cursor-pointer"
         >
           <Plus className="h-4 w-4" />
-          Nueva categoría
+          Nueva marca
         </button>
       }
     >
@@ -129,24 +129,24 @@ export default function CategoriesPage() {
             setQuery(value);
             setCurrentPage(1);
           }}
-          placeholder="Buscar por nombre de la categoría..."
+          placeholder="Buscar por nombre de la marca..."
         />
 
         {loading ? (
           <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-xl shadow-slate-200/60">
-            Cargando categorías...
+            Cargando marcas...
           </div>
         ) : (
           <>
-            <CategoriesTable
-              categories={currentCategories}
-              onDelete={setCategoryToDelete}
+            <BrandsTable
+              brands={currentBrands}
+              onDelete={setBrandToDelete}
               onSort={handleSort}
               currentSortColumn={sortColumn}
               currentSortDirection={sortDirection}
             />
             <Pagination
-              totalItems={filteredCategories.length}
+              totalItems={filteredBrands.length}
               itemsPerPage={ITEMS_PER_PAGE}
               currentPage={currentPage}
               onPageChange={setCurrentPage}
@@ -154,12 +154,12 @@ export default function CategoriesPage() {
           </>
         )}
 
-        {categoryToDelete && (
+        {brandToDelete && (
           <ConfirmDeleteModal
             isOpen
-            itemName={categoryToDelete.name}
+            itemName={brandToDelete.name}
             isLoading={deleting}
-            onCancel={() => setCategoryToDelete(null)}
+            onCancel={() => setBrandToDelete(null)}
             onConfirm={handleDelete}
           />
         )}

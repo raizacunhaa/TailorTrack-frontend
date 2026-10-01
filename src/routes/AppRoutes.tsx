@@ -10,8 +10,11 @@ import ProductsPage from '../pages/management/products';
 import CreateProductPage from '../pages/management/products/CreateProductPage';
 import EditProductPage from '../pages/management/products/EditProductPage';
 import CategoriesPage from '../pages/management/categories';
-import CreateCategoryPage from '../pages/management/categories/CreateBrandPage';
-import EditCategoryPage from '../pages/management/categories/EditBrandPage';
+import CreateCategoryPage from '../pages/management/categories/CreateCategoryPage';
+import EditCategoryPage from '../pages/management/categories/EditCategoryPage';
+import BrandsPage from '../pages/management/brands';
+import CreateBrandPage from '../pages/management/brands/CreateBrandPage';
+import EditBrandPage from '../pages/management/brands/EditBrandPage';
 
 const AppRoutes = () => {
   return (
@@ -34,6 +37,9 @@ const AppRoutes = () => {
         <Route path={ROUTES.categories.list} element={<CategoriesPage />} />
         <Route path={ROUTES.categories.create} element={<CreateCategoryPage />} />
         <Route path="/management/categories/:id/edit" element={<EditCategoryPage />} />
+        <Route path={ROUTES.brands.list} element={<BrandsPage />} />
+        <Route path={ROUTES.brands.create} element={<CreateBrandPage />} />
+        <Route path="/management/brands/:id/edit" element={<EditBrandPage />} />
       </Route>
 
       <Route path="/" element={<Navigate to={ROUTES.auth.login} />} />

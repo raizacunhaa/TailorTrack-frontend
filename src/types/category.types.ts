@@ -17,14 +17,6 @@ export interface SubCategory {
   category?: Category;
 }
 
-export interface Brand {
-  id: number;
-  name: string;
-  status?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
 export interface CreateCategoryDto {
   name: string;
 }
@@ -33,6 +25,3 @@ export interface UpdateCategoryDto {
   name?: string;
   status?: boolean;
 }
-
-export type CreateBrandDto = CreateCategoryDto;
-export type UpdateBrandDto = UpdateCategoryDto;

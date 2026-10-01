@@ -1,6 +1,7 @@
 import type { ChangeEvent, ReactNode } from 'react';
 import { ArrowLeft, Image as ImageIcon } from 'lucide-react';
 import { getDriveDirectLink } from '../../../helpers/url.helper';
+import type { Brand } from '../../../types/brand.types';
 import type { Category } from '../../../types/category.types';
 import type { ProductEditFrontend } from '../../../types/product.types';
 
@@ -70,6 +71,7 @@ export function ProductForm({
   formData,
   priceInput,
   categories,
+  brands,
   isFormInvalid,
   submitText,
   loadingOptions,
@@ -83,6 +85,7 @@ export function ProductForm({
   formData: ProductEditFrontend;
   priceInput: string;
   categories: Category[];
+  brands: Brand[];
   isFormInvalid: boolean;
   submitText: string;
   loadingOptions: boolean;
@@ -126,13 +129,20 @@ export function ProductForm({
           onChange={onChange}
           placeholder="Opcional"
         />
-        <TextInput
+        <SelectInput
           label="Marca *"
-          name="unit"
-          value={formData.unit}
+          name="brandId"
+          value={formData.brandId ?? 0}
           onChange={onChange}
-          placeholder="Ej: Levy's"
-        />
+          disabled={loadingOptions}
+        >
+          <option value="">Seleccionar...</option>
+          {brands.map((brand) => (
+            <option key={brand.id} value={brand.id}>
+              {brand.name}
+            </option>
+          ))}
+        </SelectInput>
         <div className="space-y-2">
           <label className="block text-sm font-medium text-slate-700 ml-1">Descripción</label>
           <textarea

@@ -36,9 +36,9 @@ export function ConfirmDeleteModal({
         className="w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-xl shadow-slate-900/10"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-lg font-bold text-slate-900">Confirmar eliminación</h2>
+        <h2 className="text-lg font-bold text-slate-900">Confirmar desactivación</h2>
         <p className="mt-2 text-sm text-slate-500">
-          ¿Seguro que querés eliminar <b>{itemName}</b>?
+          ¿Seguro que querés desactivar <b>{itemName}</b>?
         </p>
         <div className="mt-4 flex justify-center gap-3">
           <button
@@ -55,7 +55,7 @@ export function ConfirmDeleteModal({
             onClick={onConfirm}
             disabled={isLoading}
           >
-            Eliminar
+            Desactivar
           </button>
         </div>
       </div>
